@@ -26,6 +26,9 @@ build/
 .venv
 env/
 
+# Keep screenshots tracked
+!screenshots/
+
 # OS
 .DS_Store
 Thumbs.db
