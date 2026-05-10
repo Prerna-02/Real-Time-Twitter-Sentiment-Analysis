@@ -6,6 +6,23 @@ The ML model is a Logistic Regression classifier trained on TF-IDF bigram featur
 
 ---
 
+## Screenshots
+
+**Live Dashboard**
+<img width="940" height="426" alt="image" src="https://github.com/user-attachments/assets/b997c68d-51ef-41a0-8bc0-e2c9af3069af" />
+
+
+**Live Tweet Feed with sentiment labels**
+![Live tweet feed](screenshots/live_feed.png)
+
+**Entity sentiment breakdown (click any bar in the chart)**
+![Entity modal](screenshots/entity_modal.png)
+
+**Manual classify tab**
+![Classify tab](screenshots/classify_tab.png)
+
+---
+
 ## Architecture
 
 ```
