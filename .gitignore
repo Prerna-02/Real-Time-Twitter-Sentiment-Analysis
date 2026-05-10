@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Django
+db.sqlite3
+*.log
+
+# Spark
+ML-PySpark-Model/saved_models/
+Kafka-PySpark/checkpoints/
+C:/tmp/spark/
+
+# Conda / pip
+*.egg-info/
+dist/
+build/
+.env
+.venv
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Docs (not for repo)
+*.docx
+*.pdf

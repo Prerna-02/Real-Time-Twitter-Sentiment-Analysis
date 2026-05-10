@@ -1,0 +1,142 @@
+
+{% extends "base.html" %}
+
+{% block title %}Classify | Twitter Sentiment{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+
+    <h4 class="mb-3">🔍 Classify a Tweet</h4>
+    <p class="text-muted small mb-3">
+      Paste any tweet text below. 
+    </p>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <form id="classifyForm">
+          {% csrf_token %}
+          <div class="mb-3">
+            <textarea
+              id="tweetText"
+              name="text"
+              class="form-control"
+              rows="4"
+              placeholder="e.g. I absolutely love the new iPhone update!"
+            ></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Analyse</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Spinner -->
+    <div id="loadingSpinner" class="text-center py-4 d-none">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2 text-muted">Running models… Spark ML may take up to 30 s on first use.</p>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="d-none">
+      <div class="row g-3">
+
+        <!-- VADER -->
+        <div class="col-sm-6">
+          <div class="card h-100 result-card" id="vaderCard">
+            <div class="card-header fw-semibold">VADER (Rule-based)</div>
+            <div class="card-body text-center py-4">
+              <div class="result-label mb-1" id="vaderLabel"></div>
+              <div class="text-muted small">Compound score: <span id="vaderCompound"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spark ML -->
+        <div class="col-sm-6">
+          <div class="card h-100 result-card" id="sparkCard">
+            <div class="card-header fw-semibold">Spark ML (LR + TF-IDF)</div>
+            <div class="card-body text-center py-4">
+              <div class="result-label mb-1" id="sparkLabel"></div>
+              <div class="text-muted small">Confidence: <span id="sparkConfidence"></span></div>
+              <div class="text-danger small mt-1 d-none" id="sparkError"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function () {
+
+  const SENTIMENT_CLASSES = {
+    'Positive':   'sentiment-positive',
+    'Negative':   'sentiment-negative',
+    'Neutral':    'sentiment-neutral',
+    'Irrelevant': 'sentiment-irrelevant',
+  };
+
+  function applyCardColor(cardId, labelId, label) {
+    const $card  = $('#' + cardId);
+    const $label = $('#' + labelId);
+    $card.removeClass('sentiment-positive sentiment-negative sentiment-neutral sentiment-irrelevant border-danger');
+    $label.text(label);
+    if (SENTIMENT_CLASSES[label]) {
+      $card.addClass(SENTIMENT_CLASSES[label]);
+    }
+  }
+
+  $('#classifyForm').on('submit', function (e) {
+    e.preventDefault();
+    const text = $('#tweetText').val().trim();
+    if (!text) return;
+
+    $('#results').addClass('d-none');
+    $('#loadingSpinner').removeClass('d-none');
+
+    $.ajax({
+      url:  '/classify/',
+      type: 'POST',
+      data: {
+        text: text,
+        csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function (data) {
+        $('#loadingSpinner').addClass('d-none');
+
+        // VADER result
+        applyCardColor('vaderCard', 'vaderLabel', data.vader.label);
+        $('#vaderCompound').text(data.vader.compound);
+
+        // Spark ML result
+        if (data.spark.ok) {
+          applyCardColor('sparkCard', 'sparkLabel', data.spark.label);
+          $('#sparkConfidence').text(data.spark.confidence + '%');
+          $('#sparkError').addClass('d-none').text('');
+        } else {
+          $('#sparkLabel').text('Error');
+          $('#sparkConfidence').text('');
+          $('#sparkError').removeClass('d-none').text(
+            data.spark.error || 'Spark inference failed.'
+          );
+        }
+
+        $('#results').removeClass('d-none');
+      },
+      error: function (xhr) {
+        $('#loadingSpinner').addClass('d-none');
+        alert('Request failed: ' + xhr.responseText);
+      },
+    });
+  });
+
+});
+</script>
+{% endblock %}

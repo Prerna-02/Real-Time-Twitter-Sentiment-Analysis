@@ -1,0 +1,144 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard | Twitter Sentiment{% endblock %}
+
+{% block content %}
+
+<!-- KPI Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card kpi-card h-100">
+      <div class="card-body text-center">
+        <div class="kpi-value" id="totalTweets"></div>
+        <div class="kpi-label">Total Tweets</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card kpi-card h-100">
+      <div class="card-body text-center">
+        <div class="kpi-value text-success" id="positivePct"></div>
+        <div class="kpi-label">Positive Sentiment</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card kpi-card h-100">
+      <div class="card-body text-center">
+        <div class="kpi-value text-danger" id="negativePct"></div>
+        <div class="kpi-label">Negative Sentiment</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card kpi-card h-100">
+      <div class="card-body text-center">
+        <div class="kpi-value text-warning" id="topEntity"></div>
+        <div class="kpi-label">Top Entity</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="row g-3 mb-4">
+  <div class="col-md-5">
+    <div class="card h-100">
+      <div class="card-header">Spark ML Sentiment Split</div>
+      <div class="card-body d-flex align-items-center justify-content-center">
+        <canvas id="sentimentPie" style="max-height:280px;"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="card h-100">
+      <div class="card-header">Top 10 Entities by Tweet Volume</div>
+      <div class="card-body">
+        <canvas id="entityBar" style="max-height:280px;"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter + Table -->
+<div class="card">
+  <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <span>Live Tweet Feed</span>
+    <div class="d-flex align-items-center gap-3">
+      <select id="entityFilter" class="form-select form-select-sm" style="width:200px;">
+        <option value="">All entities</option>
+      </select>
+      <span class="text-muted small" id="lastUpdated"></span>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm table-hover mb-0" id="tweetTable">
+        <thead class="table-dark">
+          <tr>
+            <th style="width:35%">Tweet</th>
+            <th>Entity</th>
+            <th>Ground Truth</th>
+            <th>Spark ML</th>
+            <th>Confidence</th>
+            <th>VADER</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="6" class="text-center text-muted py-4">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Entity sentiment breakdown (opens on bar-chart click) -->
+<div class="modal fade" id="entityDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="entityModalTitle">Entity Breakdown</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <div class="d-flex justify-content-between mb-3 pb-2 border-bottom">
+          <span class="text-muted">Total tweets</span>
+          <strong id="entityModalTotal"></strong>
+        </div>
+
+        <h6 class="text-primary mb-2">Spark ML Sentiment</h6>
+        <ul class="list-group list-group-flush mb-3" id="entityModalSparkList"></ul>
+
+        <h6 class="text-info mb-2">VADER Sentiment</h6>
+        <ul class="list-group list-group-flush mb-3" id="entityModalVaderList"></ul>
+
+        <div class="row g-2 small">
+          <div class="col-6 text-center p-2 bg-light rounded">
+            <div class="text-muted">Spark Accuracy</div>
+            <strong id="entityModalSparkAcc"></strong>
+          </div>
+          <div class="col-6 text-center p-2 bg-light rounded">
+            <div class="text-muted">VADER Accuracy</div>
+            <strong id="entityModalVaderAcc"></strong>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-sm" id="entityModalDrillBtn">
+          Filter dashboard to this entity
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

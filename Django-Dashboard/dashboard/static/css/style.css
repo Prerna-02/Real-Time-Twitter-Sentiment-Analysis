@@ -1,0 +1,75 @@
+/* Phase 5Dashboard Styles */
+/* Custom CSS for layout, confidence badge colours, spike alert banner, KPI cards. */
+/* Implementation added in Phase 5. */
+/* ── KPI cards ─────────────────────────────────────────────────────────────── */
+.kpi-card {
+  border: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.kpi-label {
+  font-size: .78rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-top: .25rem;
+}
+
+
+/* ── Sentiment badges in the table ─────────────────────────────────────────── */
+.sentiment-badge {
+  font-size: .75rem;
+  padding: .25em .55em;
+}
+
+.badge-positive   { background-color: #28a745; color: #fff; }
+.badge-negative   { background-color: #dc3545; color: #fff; }
+.badge-neutral    { background-color: #6c757d; color: #fff; }
+.badge-irrelevant { background-color: #17a2b8; color: #fff; }
+
+.match-icon {
+  font-size: .8rem;
+  margin-left: .25rem;
+  color: #6c757d;
+}
+
+
+/* ── Tweet column truncation ───────────────────────────────────────────────── */
+.tweet-cell {
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+
+
+/* ── Classify result cards ─────────────────────────────────────────────────── */
+.result-card {
+  transition: border-color .25s, background-color .25s;
+}
+
+.result-label {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.sentiment-positive  { border-color: #28a745; background-color: #f0fff4; }
+.sentiment-negative  { border-color: #dc3545; background-color: #fff5f5; }
+.sentiment-neutral   { border-color: #6c757d; background-color: #f8f9fa; }
+.sentiment-irrelevant{ border-color: #17a2b8; background-color: #f0faff; }
+
+
+/* ── Misc ──────────────────────────────────────────────────────────────────── */
+.navbar-brand { font-size: 1rem; }
+
+.card-header {
+  font-size: .9rem;
+  font-weight: 600;
+}
