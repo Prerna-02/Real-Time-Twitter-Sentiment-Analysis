@@ -4,6 +4,7 @@ A streaming pipeline that reads tweets from a Kafka topic, classifies them using
 
 The ML model is a Logistic Regression classifier trained on TF-IDF bigram features across four sentiment classes: Positive, Negative, Neutral, and Irrelevant. The dashboard updates every 5 seconds without any page refresh.
 
+
 ---
 
 ## Screenshots
