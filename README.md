@@ -174,11 +174,49 @@ Four classes: Positive, Negative, Neutral, Irrelevant.
 
 ## Model Performance
 
-Validation accuracy after training with TF-IDF bigrams:
+Evaluated on the 1,000-row validation set. All figures are reproducible by running section 9 of `train_model.ipynb`.
 
-| Model | Accuracy |
-|---|---|
-| Spark ML (LR + TF-IDF bigrams) | ~85% |
-| VADER | ~38% |
+Because the classes are imbalanced and one of them (**Irrelevant**, 17.2% of the set) is a class VADER can never predict, results are reported two ways: the full 4-class task, and a 3-class slice with the Irrelevant rows removed to give VADER a fair comparison.
 
-VADER's lower accuracy is expected as it cannot predict the Irrelevant class, which makes up about 17% of the dataset.
+**4-class — the real task (n=1000)**
+
+| Model | Accuracy | Macro F1 | Weighted F1 |
+|---|---|---|---|
+| Spark ML (LR + TF-IDF bigrams) | **86.1%** | **0.861** | **0.861** |
+| VADER | 40.0% | 0.307 | 0.337 |
+
+**3-class — Irrelevant excluded, VADER's home turf (n=828)**
+
+| Model | Accuracy | Macro F1 | Weighted F1 |
+|---|---|---|---|
+| Spark ML (LR + TF-IDF bigrams) | **86.5%** | **0.876** | **0.876** |
+| VADER | 48.3% | 0.454 | 0.451 |
+
+**Per-class breakdown — Spark ML, 4-class**
+
+| Class | Precision | Recall | F1 | Support |
+|---|---|---|---|---|
+| Negative | 0.907 | 0.883 | 0.895 | 266 |
+| Neutral | 0.892 | 0.811 | 0.849 | 285 |
+| Positive | 0.791 | 0.903 | 0.843 | 277 |
+| Irrelevant | 0.873 | 0.843 | 0.858 | 172 |
+
+**Per-class breakdown — VADER, 4-class**
+
+| Class | Precision | Recall | F1 | Support |
+|---|---|---|---|---|
+| Negative | 0.399 | 0.579 | 0.472 | 266 |
+| Neutral | 0.362 | 0.175 | 0.236 | 285 |
+| Positive | 0.412 | 0.708 | 0.521 | 277 |
+| Irrelevant | 0.000 | 0.000 | 0.000 | 172 |
+
+**Model agreement**
+
+The two models agree on only 38.0% of tweets. When they agree, they are right 90.3% of the time — making agreement a useful confidence signal. When they disagree, Spark is correct 83.5% of the time versus VADER's 9.2%, which is why the pipeline treats Spark as the primary label and VADER as a secondary indicator.
+
+**Notes on methodology**
+
+- VADER is scored on the **raw** tweet text while Spark is scored on the cleaned text. VADER derives intensity from punctuation, capitalisation and emoji, all of which `clean_text()` strips — scoring it on cleaned text would understate it. This matches the live pipeline, where `consumer.py` runs VADER on `original_text`.
+- Dropping the Irrelevant class lifts VADER from 40.0% to 48.3%, confirming part of its 4-class score was an artefact of being asked a question it cannot answer. It remains ~38 points behind Spark even on the fair comparison.
+- VADER's Neutral recall (0.175) is its weakest result: it only reports Neutral when a tweet has almost no charged vocabulary, whereas annotators label by intent, so factual or informational tweets with charged words get misread as polarised.
+- With n=1000, accuracy near 86% carries roughly ±2.1 points at 95% confidence. The gaps above are far larger than that margin, but 1–2 point differences should not be over-interpreted.
